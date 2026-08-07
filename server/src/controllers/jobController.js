@@ -3,7 +3,10 @@ import Job from "../models/Job.js";
 
 export const createJob = async (req, res) => {
     try {
-        const job = await Job.create(req.body);
+        const job = await Job.create({
+            ...req.body,
+            user: req.userId
+        });
         res.status(201).json({
             success: true,
             data: job
@@ -21,7 +24,7 @@ export const createJob = async (req, res) => {
 
 export const getAllJobs = async (req, res) => {
     try {
-        const jobs = await Job.find();
+        const jobs = await Job.find({ user: req.userId });
         res.status(200).json({
             success: true,
             data: jobs
@@ -37,7 +40,10 @@ export const getAllJobs = async (req, res) => {
 
 export const getJobById = async (req,res) =>{
     try{
-        const job = await Job.findById(req.params.id);
+        const job = await Job.findOne({
+            _id: req.params.id,
+            user: req.userId
+        });
         if(!job){
             return res.status(404).json({
                 success: false,
@@ -59,7 +65,14 @@ export const getJobById = async (req,res) =>{
 
 export const updateJob = async (req,res) =>{
     try{
-        const job = await Job.findByIdAndUpdate(req.params.id,req.body, {new:true, runValidators:true});
+        const job = await Job.findOneAndUpdate({
+            _id: req.params.id,
+            user: req.userId
+        }, 
+        req.body, { 
+            new: true,
+            runValidators: true
+        });
         if(!job){
             return res.status(404).json({
                 success: false,
@@ -81,7 +94,10 @@ export const updateJob = async (req,res) =>{
 
 export const deleteJob = async (req,res) =>{
     try{
-        const job = await Job.findByIdAndDelete(req.params.id);
+        const job = await Job.findOneAndDelete({
+            _id: req.params.id,
+            user: req.userId
+        });
         if(!job){
             return res.status(404).json({
                 success: false,
