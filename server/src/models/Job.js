@@ -10,12 +10,36 @@ const JobSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["Saved", "Applied", "Interview", "Offer", "Rejected"],
-        default: "Applied",
-        required: true
+        enum: [
+            "Saved",
+            "Applied",
+            "Interview",
+            "Offer",
+            "Rejected",
+            "Withdrawn"
+        ],
+        default: "Applied"
     },
     location: {
         type: String,
+    },
+    jobUrl: {
+        type: String,
+    },
+    applicationDate: {
+        type: Date,
+        default: Date.now
+    },
+    notes:{
+        type: String,
+    },
+    workType:{
+        type:String,
+        enum: ["Remote", "Hybrid", "On-site"],
+    },
+    source:{
+        type: String,
+        enum: ["LinkedIn", "Indeed", "Glassdoor", "Company Website", "Referral", "Other"],
     },
     user:{
         type: mongoose.Schema.Types.ObjectId,
