@@ -24,7 +24,32 @@ export const createJob = async (req, res) => {
 
 export const getAllJobs = async (req, res) => {
     try {
-        const jobs = await Job.find({ user: req.userId });
+        const filter = {
+            user: req.userId
+        };
+        if (req.query.status){
+            filter.status = req.query.status;
+        }
+        if (req.query.workType){
+            filter.workType = req.query.workType;   
+        }
+        if (req.query.source){
+            filter.source = req.query.source;
+        }
+        if (req.query.search) {
+            filter.$or = [
+                { company: { $regex: req.query.search, $options: "i" } },
+                { role: { $regex: req.query.search, $options: "i" } }
+            ];
+        }
+        const sortOrder = req.query.sort === "oldest" ? 1 : -1;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const jobs = await Job.find(filter)
+            .sort({ applicationDate: sortOrder })
+            .skip(skip)
+            .limit(limit);        
         res.status(200).json({
             success: true,
             data: jobs
