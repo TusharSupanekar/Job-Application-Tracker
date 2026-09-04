@@ -1,4 +1,5 @@
 import Job from "../models/Job.js";
+import mongoose from "mongoose";
 
 
 export const createJob = async (req, res) => {
@@ -142,3 +143,46 @@ export const deleteJob = async (req,res) =>{
         });
     }
 };
+
+export const getJobStats = async (req,res) => {
+    try {
+        const stats = await Job.aggregate([
+            {
+                $match: {
+                    user: new mongoose.Types.ObjectId(req.userId)
+                }
+            },
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const formattedStats = {
+            total : 0,
+            Applied: 0,
+            Interview: 0,
+            Offer: 0,
+            Rejected: 0,
+            Saved: 0,
+            Withdrawn:0
+        };
+        stats.forEach((item)=>{
+            formattedStats.total += item.count;
+            formattedStats[item._id] = item.count;
+        });
+        res.status(200).json({
+            success: true,
+            data: formattedStats
+        });
+
+    }catch (error){
+        res.status(500).json({
+            success:false,
+            message: "Error getting job stats",
+            error: error.message
+        });
+    }
+}
