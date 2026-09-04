@@ -14,6 +14,13 @@ export const createJob = async (req, res) => {
         });
 
     } catch (error) {
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Job data",
+                error: error.message
+            });
+        }
         res.status(500).json({
             success: false,
             message: "Error creating job",
@@ -66,10 +73,17 @@ export const getAllJobs = async (req, res) => {
 
 export const getJobById = async (req,res) =>{
     try{
+        if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid job ID"
+            })
+        }
         const job = await Job.findOne({
             _id: req.params.id,
             user: req.userId
         });
+        
         if(!job){
             return res.status(404).json({
                 success: false,
@@ -91,6 +105,12 @@ export const getJobById = async (req,res) =>{
 
 export const updateJob = async (req,res) =>{
     try{
+        if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid job ID"
+            })
+        }
         const job = await Job.findOneAndUpdate({
             _id: req.params.id,
             user: req.userId
@@ -110,6 +130,13 @@ export const updateJob = async (req,res) =>{
             data: job
         });
     } catch (error){
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Job data",
+                error: error.message
+            });
+        }
         res.status(500).json({
             success: false,
             message: "Error updating job",
@@ -120,6 +147,12 @@ export const updateJob = async (req,res) =>{
 
 export const deleteJob = async (req,res) =>{
     try{
+        if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid job ID"
+            })
+        }
         const job = await Job.findOneAndDelete({
             _id: req.params.id,
             user: req.userId
