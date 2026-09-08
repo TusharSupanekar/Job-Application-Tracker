@@ -28,6 +28,7 @@ The backend is functional. A React frontend is planned but has not been started 
 - Resume assignment to individual job applications
 - AI-powered resume and job-description matching with Google Gemini
 - Smart analysis caching using SHA-256 content fingerprints
+- Integration tests for authentication, ownership, jobs, and resumes
 
 ## Tech Stack
 
@@ -40,6 +41,7 @@ The backend is functional. A React frontend is planned but has not been started 
 | Authentication | JSON Web Tokens |
 | Password security | bcryptjs |
 | AI integration | Google Gen AI SDK |
+| Testing | Jest and Supertest |
 | Module system | ES Modules |
 | Development server | nodemon |
 | Frontend | React (planned) |
@@ -62,6 +64,12 @@ Job_Tracker/
 |-- server/
 |   |-- server.js                 # Database connection and server startup
 |   |-- package.json
+|   |-- jest.config.js            # Jest configuration
+|   |-- tests/
+|   |   |-- setup.js              # Test database setup and cleanup
+|   |   |-- auth.test.js
+|   |   |-- job.test.js
+|   |   `-- resume.test.js
 |   `-- src/
 |       |-- app.js                # Express configuration and route mounting
 |       |-- config/
@@ -125,6 +133,32 @@ npm start
 ```
 
 The API runs at `http://localhost:5000` by default.
+
+## Testing
+
+The backend includes 10 Jest and Supertest integration tests covering:
+
+- Registration and login validation
+- User creation and JWT login flow
+- Missing and invalid authentication tokens
+- Authenticated job and resume creation
+- Job and resume ownership isolation between users
+
+Create `server/.env.test` with a dedicated test database:
+
+```env
+MONGO_URI_TEST=your_dedicated_test_database_connection_string
+JWT_SECRET=your_test_jwt_secret
+```
+
+> **Important:** The test setup deletes every document from every collection before
+> each test. Never point `MONGO_URI_TEST` at a development or production database.
+
+Run the suite from `server/`:
+
+```bash
+npm test
+```
 
 ## Authentication
 
@@ -229,10 +263,10 @@ Job applications support:
 ## Project Status
 
 The backend currently includes authentication, user-owned job management, resume
-CRUD, statistics, and AI analysis. Upcoming work includes:
+CRUD, statistics, AI analysis, and backend integration tests. Upcoming work includes:
 
 - Build the React frontend
-- Add automated tests
+- Expand automated coverage for AI analysis, queries, statistics, and full CRUD flows
 - Improve resume deletion and reference cleanup
 - Add consistent ObjectId validation to resume endpoints
 - Expand user account functionality
