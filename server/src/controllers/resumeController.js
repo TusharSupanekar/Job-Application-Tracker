@@ -1,4 +1,6 @@
 import Resume from "../models/Resume.js";
+import mongoose from "mongoose";
+import Job from "../models/Job.js";
 
 export const createResume = async (req,res) => {
     try {
@@ -51,7 +53,14 @@ export const getResumes = async (req,res)=> {
 };
 
 export const getResumeById = async (req, res) => {
+   
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid resume ID"
+            });
+        }
         const resume = await Resume.findOne({
             _id: req.params.id,
             user: req.userId
@@ -79,7 +88,14 @@ export const getResumeById = async (req, res) => {
 };
 
 export const updateResume = async (req, res) => {
+    
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid resume ID"
+            });
+        }
         const { name, resumeText } = req.body;
 
         const resume = await Resume.findOneAndUpdate(
@@ -121,7 +137,14 @@ export const updateResume = async (req, res) => {
 
 export const deleteResume = async (req, res) => {
     try {
-        const resume = await Resume.findOneAndDelete({
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid resume ID"
+            });
+        }
+
+        const resume = await Resume.findOne({
             _id: req.params.id,
             user: req.userId
         });
@@ -132,6 +155,24 @@ export const deleteResume = async (req, res) => {
                 message: "Resume not found"
             });
         }
+
+        await Job.updateMany(
+            {
+                user: req.userId,
+                resumeUsed: resume._id
+            },
+            {
+                $unset: {
+                    resumeUsed: "",
+                    analysis: ""
+                }
+            }
+        );
+
+        await Resume.deleteOne({
+            _id: resume._id,
+            user: req.userId
+        });
 
         return res.status(200).json({
             success: true,
