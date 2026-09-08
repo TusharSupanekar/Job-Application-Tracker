@@ -1,5 +1,23 @@
 import mongoose from 'mongoose';
 
+
+const analysisSchema = new mongoose.Schema(
+    {
+        matchScore: Number,
+        matchedSkills: [String],
+        missingSkills: [String],
+        summary: String,
+        suggestions: [String],
+        analyzedAt: Date,
+        resumeHash: String,
+        jobDescriptionHash: String
+    },
+    {
+        _id: false
+    }
+);
+
+
 const JobSchema = new mongoose.Schema({
     company: {
         type: String,
@@ -54,20 +72,15 @@ const JobSchema = new mongoose.Schema({
         ref: "Resume"
     },
     analysis: {
-        matchScore: Number,
-        matchedSkills: [String],
-        missingSkills: [String],
-        summary: String,
-        suggestions: [String],
-        analyzedAt: Date,
-
-        resumeHash: String,
-        jobDescriptionHash: String
+        type: analysisSchema,
+        default: undefined
     }
 }, 
 { 
     timestamps: true
 });
+
+
 
 const Job = mongoose.model("Job", JobSchema);
 export default Job;
