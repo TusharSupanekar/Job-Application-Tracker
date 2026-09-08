@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 export const registerUser = async (req, res) => {
     try{
         const {name, email, password} = req.body;
-        if (!name || !email || !passowrd) {
+        if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide name, email and password"
@@ -48,6 +48,13 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required"
+            });
+        }
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({
