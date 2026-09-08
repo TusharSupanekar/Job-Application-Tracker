@@ -136,13 +136,17 @@ The API runs at `http://localhost:5000` by default.
 
 ## Testing
 
-The backend includes 10 Jest and Supertest integration tests covering:
+The backend includes 12 Jest and Supertest integration tests covering:
 
 - Registration and login validation
 - User creation and JWT login flow
 - Missing and invalid authentication tokens
 - Authenticated job and resume creation
 - Job and resume ownership isolation between users
+- Invalid resume ID handling
+- Resume reference and analysis cleanup after deletion
+
+All 12 current test cases pass.
 
 Create `server/.env.test` with a dedicated test database:
 
@@ -267,8 +271,6 @@ CRUD, statistics, AI analysis, and backend integration tests. Upcoming work incl
 
 - Build the React frontend
 - Expand automated coverage for AI analysis, queries, statistics, and full CRUD flows
-- Improve resume deletion and reference cleanup
-- Add consistent ObjectId validation to resume endpoints
 - Expand user account functionality
 
 ## Learning Goals
