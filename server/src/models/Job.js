@@ -46,6 +46,24 @@ const JobSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
+    jobDescription:{
+        type: String,
+    },
+    resumeUsed: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Resume"
+    },
+    analysis: {
+        matchScore: Number,
+        matchedSkills: [String],
+        missingSkills: [String],
+        summary: String,
+        suggestions: [String],
+        analyzedAt: Date,
+
+        resumeHash: String,
+        jobDescriptionHash: String
+    }
 }, 
 { 
     timestamps: true

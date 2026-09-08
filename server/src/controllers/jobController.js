@@ -1,6 +1,6 @@
 import Job from "../models/Job.js";
 import mongoose from "mongoose";
-
+import Resume from "../models/Resume.js";
 
 export const createJob = async (req, res) => {
     try {
@@ -111,14 +111,14 @@ export const updateJob = async (req,res) =>{
                 message: "Invalid job ID"
             })
         }
-        const job = await Job.findOneAndUpdate({
-            _id: req.params.id,
-            user: req.userId
-        }, 
-        req.body, { 
-            new: true,
-            runValidators: true
-        });
+        const job = await Job.findOneAndUpdate(
+            { _id: req.params.id, user: req.userId },
+            req.body,
+            {
+                returnDocument: "after",
+                runValidators: true
+            }
+        );
         if(!job){
             return res.status(404).json({
                 success: false,
@@ -215,6 +215,63 @@ export const getJobStats = async (req,res) => {
         res.status(500).json({
             success:false,
             message: "Error getting job stats",
+            error: error.message
+        });
+    }
+}
+
+
+export const assignResumeToJob = async (req, res) => {
+    try {
+        const { resumeId } = req.body;
+
+        if (!resumeId) {
+            return res.status(400).json({
+                success: false,
+                message: "Resume ID is required"
+            });
+        }
+
+        const job = await Job.findOne({
+            _id: req.params.id,
+            user: req.userId
+        });
+
+        if (!job) {
+            return res.status(404).json({
+                success: false,
+                message: "Job not found"
+            });
+        }
+        const resume = await Resume.findOne({
+            _id: resumeId,
+            user: req.userId
+        });
+
+        if (!resume) {
+            return res.status(404).json({
+                success: false,
+                message: "Resume not found"
+            });
+        }
+
+        job.resumeUsed = resume._id;
+
+        job.analysis = undefined; 
+
+        await job.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Resume assigned to job successfully",
+            data: job
+        });
+
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Error assigning resume to job",
             error: error.message
         });
     }
